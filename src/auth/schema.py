@@ -19,4 +19,7 @@ class UserModel(BaseModel) :
     is_active :bool 
     created_at : datetime
     updated_at : datetime     
-    
+
+class UserLoginModel(BaseModel):
+    email : str 
+    password : str     

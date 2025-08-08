@@ -1,15 +1,18 @@
 from  fastapi  import APIRouter ,Depends
-from src.auth.schema import CreateUserModel
+from src.auth.schema import CreateUserModel , UserLoginModel ,UserModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.servises import UserServises
 from fastapi.exceptions import HTTPException
 from fastapi import status 
 from src.db.main import get_session
-from  src.auth.schema import UserModel
+from src.auth.utils import create_access_token ,verify_password
+from  datetime import timedelta
+from fastapi.responses import JSONResponse
 
 auth_router = APIRouter()
 user_servises = UserServises()
 
+REFRESH_TOKEN_EXPIRY= 2
 
 @auth_router.post('/signup',response_model=UserModel,status_code=status.HTTP_201_CREATED)
 async  def signup(user : CreateUserModel,session : AsyncSession = Depends(get_session)):
@@ -20,5 +23,43 @@ async  def signup(user : CreateUserModel,session : AsyncSession = Depends(get_se
     new_user =  await user_servises.create_user(user,session) 
     return new_user 
     
-    
+@auth_router.post('/login',status_code=status.HTTP_200_OK)
+async  def signin(login_data: UserLoginModel ,session : AsyncSession= Depends(get_session)):
+   email = login_data.email
+   password = login_data.password
+   user = await  user_servises.get_user_by_email(email,session)
+   if user  is not None :
+      password_verify = verify_password(password, user.password_hash)
+      
+      if password_verify :
+         access_token = create_access_token(
+            {
+               'email' : email,
+               'uid' :str( user.uid) ,
+            }
+         )
+         refresh_token = create_access_token(
+            user_data={
+               'email' : email,
+               'uid' :str( user.uid) ,
+            },
+            expiry= timedelta(days=REFRESH_TOKEN_EXPIRY),
+            refresh=True
+         )
+         return JSONResponse(
+           {
+            'message' : 'login sucessfully',
+            'user' : {
+               'uid' : str(user.uid),
+               'email' : email
+            } ,
+            'access' : access_token,
+            'refresh' : refresh_token
+         }
+         )      
+   raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='crendential does not match')   
+         
+      
+   
+       
          

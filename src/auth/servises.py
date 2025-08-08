@@ -9,7 +9,7 @@ class UserServises:
         statement = select(User).where(User.email == email)
         
         result = await session.execute(statement)
-        user =result.first()
+        user =result.scalars().first()
         return user
     
     async  def user_exists(self,email :str,session :AsyncSession):
