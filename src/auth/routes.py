@@ -6,8 +6,9 @@ from fastapi.exceptions import HTTPException
 from fastapi import status 
 from src.db.main import get_session
 from src.auth.utils import create_access_token ,verify_password
-from  datetime import timedelta
+from  datetime import timedelta,datetime
 from fastapi.responses import JSONResponse
+from src.auth.dependency import RefreshTokenBearer
 
 auth_router = APIRouter()
 user_servises = UserServises()
@@ -59,7 +60,18 @@ async  def signin(login_data: UserLoginModel ,session : AsyncSession= Depends(ge
          )      
    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='crendential does not match')   
          
-      
+@auth_router.get('/refresh',status_code=status.HTTP_200_OK)
+async  def get_access_token(user_details: dict = Depends(RefreshTokenBearer())):
+   print(user_details)
+   expairy_timestamp = user_details.get('exp')
+   if  datetime.fromtimestamp(expairy_timestamp) > datetime.now() :
+      new_access_token= create_access_token(
+         user_data= user_details.get('user')
+      )
+      return {
+         'access' : new_access_token
+      }
+   raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid and expiry token')
    
        
          
