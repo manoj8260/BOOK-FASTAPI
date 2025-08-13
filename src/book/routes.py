@@ -7,13 +7,15 @@ from src.db.main import get_session
 from src.book.servises import BookServises
 from  sqlmodel.ext.asyncio.session import AsyncSession
 from .models import Book
-from src.auth.dependency import AccessTokenBearer
+from src.auth.dependency import AccessTokenBearer ,RoleBasedAccess
+
 
 book_router = APIRouter()
 book_servise = BookServises()
 access_token_bearer = AccessTokenBearer()
+role_access = Depends(RoleBasedAccess(['user']))
 
-@book_router.get('/',response_model=List[Book])
+@book_router.get('/',response_model=List[Book],dependencies=[role_access])
 async def all_books(session :AsyncSession = Depends(get_session) , user_details = Depends(access_token_bearer)):
     books = await book_servise.get_books(session)
     print(user_details)

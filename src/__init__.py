@@ -17,10 +17,9 @@ app = FastAPI(
     title= 'BookLy' ,
     description='API end points for book',
     version=version,
-    lifespan=life_span
-    
+    # lifespan=life_span   
 )
 
-
+app.include_router(auth_router,prefix=f'/api/{version}/auth' , tags=['User'])
 app.include_router(book_router,prefix=f'/api/{version}/books' , tags=['Books'])
-app.include_router(auth_router,prefix=f'/api/{version}/user' , tags=['user'])
+

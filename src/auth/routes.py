@@ -8,10 +8,12 @@ from src.db.main import get_session
 from src.auth.utils import create_access_token ,verify_password
 from  datetime import timedelta,datetime
 from fastapi.responses import JSONResponse
-from src.auth.dependency import RefreshTokenBearer
+from src.auth.dependency import RefreshTokenBearer,AccessTokenBearer ,get_current_user , RoleBasedAccess
+from src.auth.redis import blacklist_token 
 
 auth_router = APIRouter()
 user_servises = UserServises()
+role_access = RoleBasedAccess(['admin','user'])
 
 REFRESH_TOKEN_EXPIRY= 2
 
@@ -61,17 +63,29 @@ async  def signin(login_data: UserLoginModel ,session : AsyncSession= Depends(ge
    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='crendential does not match')   
          
 @auth_router.get('/refresh',status_code=status.HTTP_200_OK)
-async  def get_access_token(user_details: dict = Depends(RefreshTokenBearer())):
-   print(user_details)
-   expairy_timestamp = user_details.get('exp')
+async  def get_access_token(token_details: dict = Depends(RefreshTokenBearer())):
+   print(token_details)
+   expairy_timestamp = token_details.get('exp')
    if  datetime.fromtimestamp(expairy_timestamp) > datetime.now() :
       new_access_token= create_access_token(
-         user_data= user_details.get('user')
+         user_data= token_details.get('user')
       )
       return {
          'access' : new_access_token
       }
    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid and expiry token')
-   
+
+@auth_router.get('/me',status_code=status.HTTP_200_OK)
+async  def current_user(user = Depends(get_current_user), bool  = Depends(role_access)):
+   return user    
        
-         
+@auth_router.get('/logout')
+async  def signout(token_details: dict = Depends(AccessTokenBearer())) :
+   jti = token_details['jti']
+   await   blacklist_token(jti)
+   
+   return    JSONResponse(
+       {
+          'message' : 'Logged out sucessfullt'
+       } , status_code= status.HTTP_200_OK
+   ) 
