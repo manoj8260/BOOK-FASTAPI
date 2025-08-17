@@ -1,5 +1,5 @@
 from  fastapi  import APIRouter ,Depends
-from src.auth.schema import CreateUserModel , UserLoginModel ,UserModel
+from src.auth.schema import CreateUserModel , UserLoginModel ,UserModel ,UserBookModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.servises import UserServises
 from fastapi.exceptions import HTTPException
@@ -20,7 +20,7 @@ REFRESH_TOKEN_EXPIRY= 2
 @auth_router.post('/signup',response_model=UserModel,status_code=status.HTTP_201_CREATED)
 async  def signup(user : CreateUserModel,session : AsyncSession = Depends(get_session)):
     exists_user = await user_servises.user_exists(user.email,session)
-    print(exists_user)
+   #  print(exists_user)
     if exists_user  :          
        raise  HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='user in the email is already exists')
     new_user =  await user_servises.create_user(user,session) 
@@ -75,7 +75,7 @@ async  def get_access_token(token_details: dict = Depends(RefreshTokenBearer()))
       }
    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid and expiry token')
 
-@auth_router.get('/me',status_code=status.HTTP_200_OK)
+@auth_router.get('/me',status_code=status.HTTP_200_OK,response_model=UserBookModel)
 async  def current_user(user = Depends(get_current_user), bool  = Depends(role_access)):
    return user    
        

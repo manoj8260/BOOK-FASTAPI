@@ -7,7 +7,7 @@ from src.auth.servises import UserServises
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from typing import List
-from  src.auth.models import User
+from  src.db.models import User
 
 user_servise = UserServises()
 
@@ -28,7 +28,7 @@ class TokenBearer(HTTPBearer):
             
         
         self.verify_token_data(token_data)
-        print(token_data)
+        # print(token_data)
         return token_data
     
     def is_valid_token(self,token) :
@@ -53,7 +53,7 @@ class RefreshTokenBearer(TokenBearer):
 async  def get_current_user(token_data : dict  = Depends(AccessTokenBearer()) , session :AsyncSession =Depends(get_session) )  :
     email = token_data['user']['email']
     user =  await user_servise.get_user_by_email(email,session)  
-    print(user)
+    # print(user)
     if user : 
        return user
     else :
