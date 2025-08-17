@@ -5,3 +5,20 @@ notepad.txt
 
 # py file
 **/postgresql.py
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+
+# IDE configs
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
