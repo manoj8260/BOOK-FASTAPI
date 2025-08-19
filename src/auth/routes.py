@@ -10,6 +10,7 @@ from  datetime import timedelta,datetime
 from fastapi.responses import JSONResponse
 from src.auth.dependency import RefreshTokenBearer,AccessTokenBearer ,get_current_user , RoleBasedAccess
 from src.auth.redis import blacklist_token 
+from src.errors import UserAleradyExists
 
 auth_router = APIRouter()
 user_servises = UserServises()
@@ -22,7 +23,7 @@ async  def signup(user : CreateUserModel,session : AsyncSession = Depends(get_se
     exists_user = await user_servises.user_exists(user.email,session)
    #  print(exists_user)
     if exists_user  :          
-       raise  HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='user in the email is already exists')
+       raise  UserAleradyExists()
     new_user =  await user_servises.create_user(user,session) 
     return new_user 
     
