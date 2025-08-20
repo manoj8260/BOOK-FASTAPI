@@ -27,8 +27,9 @@ class  ReviewServies:
             
             return new_review           
       except  Exception  as e :
+      
             raise  HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail= f'oops... somethig went to wrong : {e}'
+                detail= f'oops... somethig went to wrong '
                 ) 
         

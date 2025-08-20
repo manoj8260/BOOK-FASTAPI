@@ -23,7 +23,6 @@ async def all_books(session :AsyncSession = Depends(get_session) ,  token_detail
 @book_router.get('/user/{user_uid}',response_model=List[Book],dependencies=[role_access])
 async def all_books(user_uid:str,session :AsyncSession = Depends(get_session) ,  token_details:dict = Depends(access_token_bearer)):
     # print(token_details)
-    
     books = await book_servise.get_user_books(user_uid,session)
     return  books
 

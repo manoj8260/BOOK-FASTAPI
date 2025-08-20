@@ -2,6 +2,7 @@ from  typing import Any , Callable
 from  fastapi.requests import Request
 from  fastapi.responses import JSONResponse
 from fastapi import status
+from fastapi import FastAPI
 
 
 class BooklyExceptions(Exception):
@@ -115,7 +116,7 @@ exception_handlers = {
 # ✅ Register all handlers in a loop
 # -------------------------------
 
-def register_exception_handlers(app):
+def register_exception_handlers(app :FastAPI):
     for exc_class, cfg in exception_handlers.items():
      app.add_exception_handler(
         exc_class,
