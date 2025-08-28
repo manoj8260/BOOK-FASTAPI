@@ -4,6 +4,9 @@ import uuid
 from typing import List
 from src.db.models import Book
 
+class EmailModel(BaseModel):
+    addresses : List[str]
+
 class CreateUserModel(BaseModel):
     first_name : str = Field(min_length=5)
     last_name : str  = Field(min_length=5)

@@ -11,12 +11,29 @@ from fastapi.responses import JSONResponse
 from src.auth.dependency import RefreshTokenBearer,AccessTokenBearer ,get_current_user , RoleBasedAccess
 from src.auth.redis import blacklist_token 
 from src.errors import UserAleradyExists
+# for send email
+from src.auth.schema import EmailModel
+from src.mails import mail , send_message
+
 
 auth_router = APIRouter()
 user_servises = UserServises()
 role_access = RoleBasedAccess(['admin','user'])
 
 REFRESH_TOKEN_EXPIRY= 2
+
+@auth_router.post('/send_email')
+async def send_email(emails:EmailModel):
+   emails = emails.addresses
+   html ='<h1> welcome to BOOKly app'
+   subject = 'Sucess'
+   message = send_message(emails,subject=subject,body=html)
+   await mail.send_message(message)
+   
+   return  {
+      "message" : "Email send Sucessfully"
+   }
+
 
 @auth_router.post('/signup',response_model=UserModel,status_code=status.HTTP_201_CREATED)
 async  def signup(user : CreateUserModel,session : AsyncSession = Depends(get_session)):
