@@ -72,5 +72,4 @@ class RoleBasedAccess:
         if user.role in self.role_access:
             return True
         else :
-            raise PermissionError()
-                    
+            raise PermissionError()                    

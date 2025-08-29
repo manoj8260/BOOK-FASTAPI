@@ -23,7 +23,13 @@ class UserModel(BaseModel) :
     password_hash :str = Field(exclude=True)
     is_active :bool 
     created_at : datetime
-    updated_at : datetime  
+    updated_at : datetime 
+    
+class RegisterModel(BaseModel):
+    Message: str
+    Hints: str
+    User: UserModel
+         
     
 class UserBookModel(UserModel):     
     books :List[Book]  
