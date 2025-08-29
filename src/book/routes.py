@@ -8,7 +8,7 @@ from src.book.servises import BookServises
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.models import Book
 from src.auth.dependency import AccessTokenBearer ,RoleBasedAccess
-
+from src.errors import BookNotFound
 
 book_router = APIRouter()
 book_servise = BookServises()
@@ -22,7 +22,7 @@ async def all_books(session :AsyncSession = Depends(get_session) ,  token_detail
     return  books
 @book_router.get('/user/{user_uid}',response_model=List[Book],dependencies=[role_access])
 async def all_books(user_uid:str,session :AsyncSession = Depends(get_session) ,  token_details:dict = Depends(access_token_bearer)):
-    print(token_details)
+    # print(token_details)
     books = await book_servise.get_user_books(user_uid,session)
     return  books
 
@@ -38,7 +38,7 @@ async def get_book(book_uid : str ,session :AsyncSession = Depends(get_session),
     if book :
         return book
     else :
-       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='book not found')    
+       raise BookNotFound()
 
 @book_router.put('/{book_uid}')
 async def update_book(book_uid : str,update_book :UpdateBook,session :AsyncSession = Depends(get_session) , token_details:dict = Depends(access_token_bearer)):

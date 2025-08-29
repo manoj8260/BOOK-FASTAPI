@@ -48,7 +48,7 @@ class Book(SQLModel,table= True):
         
         user_uid : uuid.UUID = Field(sa_column=Column(pg.UUID,ForeignKey("users.uid", ondelete="CASCADE") ,nullable=False))
         user : Optional[User] = Relationship(back_populates='books')
-        reviews : Optional['Review'] =  Relationship(back_populates='books')
+        reviews : Optional['Review'] =  Relationship(back_populates='book')
         
         def __repr__(self):
                 return f"<Book {self.title}"

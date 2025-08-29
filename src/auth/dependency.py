@@ -8,6 +8,11 @@ from src.db.main import get_session
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from typing import List
 from  src.db.models import User
+from src.errors import (
+    InvalidToken , RevokedToken ,
+    AccessTokenRequired , RefreshTokenRequired,
+    UserNotFound , PermissionError
+    )
 
 user_servise = UserServises()
 
@@ -20,11 +25,11 @@ class TokenBearer(HTTPBearer):
         token = credentials.credentials
         
         if  not self.is_valid_token(token) :
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail={'error' : 'token is expairy or envoked','resulation': 'please get a new token' })
+            raise InvalidToken()
         token_data = token_decode(token)
         
         if  await is_token_blacklisted(token_data['jti']):
-             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail={'error' : 'token is expairy or envoked','resulation': 'please get a new token' })
+             raise RevokedToken()
             
         
         self.verify_token_data(token_data)
@@ -43,12 +48,12 @@ class TokenBearer(HTTPBearer):
 class AccessTokenBearer(TokenBearer):
     def verify_token_data(self,token_data:str):
          if token_data and  token_data['refresh']  :
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='please pass access token')   
+            raise AccessTokenRequired()
         
 class RefreshTokenBearer(TokenBearer):
     def verify_token_data(self,token_data:str):
          if token_data and  not  token_data['refresh']  :
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='please pass refresh token')   
+            raise  RefreshTokenRequired()
         
 async  def get_current_user(token_data : dict  = Depends(AccessTokenBearer()) , session :AsyncSession =Depends(get_session) )  :
     email = token_data['user']['email']
@@ -57,7 +62,7 @@ async  def get_current_user(token_data : dict  = Depends(AccessTokenBearer()) , 
     if user : 
        return user
     else :
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='user not found')         
+        raise    UserNotFound()    
 
 class RoleBasedAccess:
     def __init__(self,role_access: List[str] )->None :
@@ -67,5 +72,4 @@ class RoleBasedAccess:
         if user.role in self.role_access:
             return True
         else :
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="you`re not authorised user to access")
-                    
+            raise PermissionError()                    
