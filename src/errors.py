@@ -32,6 +32,9 @@ class PermissionError(BooklyExceptions):
 class BookNotFound(BooklyExceptions):
     '''Book not found'''
     pass
+class UserNotVerified(BooklyExceptions):
+    "User Not Verifiyied"
+    pass
 # internal server error
 async def internal_server_error(request,exc):
     return JSONResponse(
@@ -107,6 +110,13 @@ exception_handlers = {
         "detail": {
             "message": "Permission denied",
             "resolution": "You don’t have permission to perform this action"
+        }
+    },
+    UserNotVerified :{
+        "status": status.HTTP_403_FORBIDDEN,
+        "detail": {
+            "message": "User Not Verified",
+            "resolution": "Please check your email to verify tour accounts"
         }
     },
 }

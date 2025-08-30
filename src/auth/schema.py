@@ -36,4 +36,11 @@ class UserBookModel(UserModel):
 
 class UserLoginModel(BaseModel):
     email : str 
-    password : str     
+    password : str  
+    
+class PasswordResetRequest(BaseModel):
+    email :str  
+
+class PasswordResetConfirm(BaseModel):
+    new_password :str
+    confirm_new_password : str         

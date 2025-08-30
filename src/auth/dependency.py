@@ -11,7 +11,7 @@ from  src.db.models import User
 from src.errors import (
     InvalidToken , RevokedToken ,
     AccessTokenRequired , RefreshTokenRequired,
-    UserNotFound , PermissionError
+    UserNotFound , PermissionError ,UserNotVerified
     )
 
 user_servise = UserServises()
@@ -69,6 +69,8 @@ class RoleBasedAccess:
         self.role_access = role_access
      
     def __call__(self, user : User = Depends(get_current_user)):
+        if not user.is_active :
+            raise UserNotVerified()
         if user.role in self.role_access:
             return True
         else :

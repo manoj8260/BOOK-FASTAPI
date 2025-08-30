@@ -19,9 +19,18 @@ from src.middleware import register_middleware
 version ='v1'
 app = FastAPI(
     title= 'BookLy' ,
-    description='API end points for book',
+    description='A REST API for a book review api  end points ',
     version=version,
-    # lifespan=life_span   
+    # lifespan=life_span  
+    contact={
+        'Name' : 'Manoj Kumar nayak',
+        'Email' :'mn047653@gmail.com',
+        'URL' : 'https://github.com/manoj8260/BOOK-FASTAPI'
+    },
+    docs_url=f'/api/{version}/docs' ,
+    openapi_url=f'/api/{version}/openapi.json',
+    redoc_url=f'/api/{version}/redocs',
+    
 )
 register_exception_handlers(app)
 register_middleware(app)

@@ -1,5 +1,5 @@
 import redis.asyncio as aioredis
-from  src.book.config import Config
+from  src.config import Config
 
 JTI_EXPIRY= 3600
 

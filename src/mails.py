@@ -1,5 +1,5 @@
 from fastapi_mail import FastMail ,ConnectionConfig ,MessageSchema,MessageType
-from src.book.config import Config
+from src.config import Config
 from typing import List
 
 
@@ -17,7 +17,7 @@ mail_conf = ConnectionConfig(
 
 mail = FastMail(config=mail_conf)
 
-def send_message(recipients:list[str],subject:str,body:str):
+def create_message(recipients:list[str],subject:str,body:str):
     message = MessageSchema(
         recipients=recipients,
         subject=subject,
